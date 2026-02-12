@@ -49,7 +49,7 @@ RUN echo '#!/bin/bash\n\
 EXPOSE 7860
 
 # Set environment variables
-ENV AI_SERVER_URL=http://localhost:5000
+ENV AI_SERVER_URL=http://127.0.0.1:5000
 ENV PORT=7860
 ENV NODE_ENV=production
 
