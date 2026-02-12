@@ -1,44 +1,37 @@
-# Multi-stage build for Hugging Face Space
-FROM python:3.9-slim as ai-builder
-
-WORKDIR /app/ai-server
-
-# Install Python dependencies
-COPY ai-server/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy AI server files
-COPY ai-server/ .
-
-# Node.js stage
-FROM node:18-slim
+# Hugging Face Space - Docker Configuration
+FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install Python runtime for AI server
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    python3.9 \
-    python3-pip \
+    curl \
+    gnupg \
+    build-essential \
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Python dependencies from builder
-COPY --from=ai-builder /usr/local/lib/python3.9/site-packages /usr/local/lib/python3.9/site-packages
-COPY --from=ai-builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
+# Copy and install Python dependencies
+COPY ai-server/requirements.txt /app/ai-server/
+RUN pip install --no-cache-dir -r /app/ai-server/requirements.txt
 
 # Copy AI server
 COPY ai-server/ /app/ai-server/
 
-# Install Node.js dependencies
-COPY plant-disease-scanner/package*.json /app/
+# Copy and install Node.js dependencies
+COPY plant-disease-scanner/package*.json /app/plant-disease-scanner/
+WORKDIR /app/plant-disease-scanner
 RUN npm ci --only=production
 
 # Copy Node.js app
-COPY plant-disease-scanner/ /app/
+COPY plant-disease-scanner/ /app/plant-disease-scanner/
 
 # Create startup script
+WORKDIR /app
 RUN echo '#!/bin/bash\n\
-    cd /app/ai-server && gunicorn --bind 0.0.0.0:5000 ai_server:app --timeout 120 &\n\
-    cd /app && node server.js' > /app/start.sh && chmod +x /app/start.sh
+    cd /app/ai-server && gunicorn --bind 0.0.0.0:5000 ai_server:app --timeout 120 --workers 1 &\n\
+    cd /app/plant-disease-scanner && node server.js' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port 3000 (HF Spaces expects single port)
 EXPOSE 3000
