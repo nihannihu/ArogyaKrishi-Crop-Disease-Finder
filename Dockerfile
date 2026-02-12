@@ -31,14 +31,14 @@ COPY plant-disease-scanner/ /app/plant-disease-scanner/
 WORKDIR /app
 RUN echo '#!/bin/bash\n\
     cd /app/ai-server && gunicorn --bind 0.0.0.0:5000 ai_server:app --timeout 120 --workers 1 &\n\
-    cd /app/plant-disease-scanner && node server.js' > /app/start.sh && chmod +x /app/start.sh
+    cd /app/plant-disease-scanner && PORT=7860 node server.js' > /app/start.sh && chmod +x /app/start.sh
 
-# Expose port 3000 (HF Spaces expects single port)
-EXPOSE 3000
+# Expose port 7860 (HF Spaces default)
+EXPOSE 7860
 
 # Set environment variables
 ENV AI_SERVER_URL=http://localhost:5000
-ENV PORT=3000
+ENV PORT=7860
 ENV NODE_ENV=production
 
 CMD ["/app/start.sh"]
