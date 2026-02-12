@@ -44,7 +44,7 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     const imageFile = req.files.image;
-    
+
     // Forward the image to the Python AI server
     try {
       // Send the image file directly as multipart form data
@@ -54,30 +54,33 @@ app.post('/api/analyze', async (req, res) => {
         filename: imageFile.name,
         contentType: imageFile.mimetype
       });
-      
+
       const aiResponse = await axios.post(`${AI_SERVER_URL}/predict`, form, {
         headers: {
           ...form.getHeaders()
-        }
+        },
+        timeout: 60000, // 60 second timeout for AI prediction
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
       });
-      
+
       const result = new Result({
         disease: aiResponse.data.disease,
         confidence: aiResponse.data.confidence || 95, // Default confidence if not provided
         imageUrl: `/uploads/${imageFile.name}`
       });
-      
+
       await result.save();
-      
+
       // Save to prediction history
       const prediction = new Prediction({
         diseaseName: aiResponse.data.disease,
         confidence: aiResponse.data.confidence || 95,
         imageUrl: `/uploads/${imageFile.name}`
       });
-      
+
       await prediction.save();
-      
+
       // Send response back to frontend
       res.json({
         success: true,
@@ -137,18 +140,18 @@ app.delete('/api/history', async (req, res) => {
 app.get('/api/weather-alerts', async (req, res) => {
   try {
     const { lat, lon } = req.query;
-    
+
     if (!lat || !lon) {
       return res.status(400).json({ error: 'Latitude and longitude are required' });
     }
-    
+
     // Get weather forecast from OpenWeatherMap
     const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY || '465c63cc77ee43d692f4e8c7a0dc430a';
     const weatherUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=metric`;
-    
+
     const weatherResponse = await axios.get(weatherUrl);
     const forecast = weatherResponse.data.list;
-    
+
     // Disease risk conditions
     const diseaseConditions = {
       'Tomato___Late_blight': {
@@ -213,13 +216,13 @@ app.get('/api/weather-alerts', async (req, res) => {
       }
       // Additional diseases can be added here
     };
-    
+
     // Check for risk conditions in the next 3 days
     const riskAlerts = [];
     const today = new Date();
     const threeDaysFromNow = new Date(today);
     threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-    
+
     // Group forecast by day
     const dailyForecasts = {};
     forecast.forEach(item => {
@@ -229,22 +232,22 @@ app.get('/api/weather-alerts', async (req, res) => {
       }
       dailyForecasts[date].push(item);
     });
-    
+
     // Check each disease condition
     Object.keys(diseaseConditions).forEach(diseaseKey => {
       const disease = diseaseConditions[diseaseKey];
       let riskCount = 0;
-      
+
       Object.keys(dailyForecasts).slice(0, 3).forEach(date => {
         const dayForecasts = dailyForecasts[date];
         let conditionMet = false;
-        
+
         // Check if any forecast for the day meets the conditions
         for (const forecastItem of dayForecasts) {
           const humidity = forecastItem.main.humidity;
           const temperature = forecastItem.main.temp;
           const rain = forecastItem.rain ? true : false;
-          
+
           // Check all conditions for this disease
           let allConditionsMet = true;
           for (const condition of disease.conditions) {
@@ -258,7 +261,7 @@ app.get('/api/weather-alerts', async (req, res) => {
                 if (humidity >= maxHumidity) allConditionsMet = false;
               }
             }
-            
+
             // Check temperature condition
             if (condition.temperature) {
               if (condition.temperature.includes('-')) {
@@ -272,24 +275,24 @@ app.get('/api/weather-alerts', async (req, res) => {
                 if (temperature >= maxTemp) allConditionsMet = false;
               }
             }
-            
+
             // Check rain condition
             if (condition.rain !== undefined && condition.rain !== rain) {
               allConditionsMet = false;
             }
           }
-          
+
           if (allConditionsMet) {
             conditionMet = true;
             break;
           }
         }
-        
+
         if (conditionMet) {
           riskCount++;
         }
       });
-      
+
       if (riskCount > 0) {
         riskAlerts.push({
           disease: disease.name,
@@ -300,7 +303,7 @@ app.get('/api/weather-alerts', async (req, res) => {
         });
       }
     });
-    
+
     res.json({
       success: true,
       alerts: riskAlerts,
