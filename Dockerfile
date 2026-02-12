@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     build-essential \
-    netcat-openbsd \
     && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
@@ -28,24 +27,23 @@ RUN npm ci --only=production
 # Copy Node.js app
 COPY plant-disease-scanner/ /app/plant-disease-scanner/
 
-# Create startup script with health check
+# Create startup script with proper wait
 WORKDIR /app
 RUN echo '#!/bin/bash\n\
-    echo "Starting AI Server..."\n\
-    cd /app/ai-server && gunicorn --bind 0.0.0.0:5000 ai_server:app --timeout 120 --workers 1 &\n\
+    set -e\n\
+    echo "=== Starting AI Server ==="\n\
+    cd /app/ai-server\n\
+    gunicorn --bind 0.0.0.0:5000 ai_server:app --timeout 120 --workers 1 --daemon\n\
     \n\
-    echo "Waiting for AI Server to be ready..."\n\
-    for i in {1..60}; do\n\
-    if curl -s http://localhost:5000/ > /dev/null 2>&1; then\n\
-    echo "AI Server is ready!"\n\
-    break\n\
-    fi\n\
-    echo "Waiting... ($i/60)"\n\
-    sleep 2\n\
-    done\n\
+    echo "=== Waiting 30 seconds for AI server to load model ==="\n\
+    sleep 30\n\
     \n\
-    echo "Starting Node.js Server..."\n\
-    cd /app/plant-disease-scanner && PORT=7860 node server.js' > /app/start.sh && chmod +x /app/start.sh
+    echo "=== Testing AI Server ==="\n\
+    curl -f http://localhost:5000/ || echo "Warning: AI server health check failed"\n\
+    \n\
+    echo "=== Starting Node.js Server on port 7860 ==="\n\
+    cd /app/plant-disease-scanner\n\
+    exec node server.js' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port 7860 (HF Spaces default)
 EXPOSE 7860
