@@ -59,7 +59,7 @@ app.post('/api/analyze', async (req, res) => {
         headers: {
           ...form.getHeaders()
         },
-        timeout: 60000, // 60 second timeout for AI prediction
+        timeout: 120000, // 120 second timeout for AI prediction on CPU
         maxContentLength: Infinity,
         maxBodyLength: Infinity
       });
