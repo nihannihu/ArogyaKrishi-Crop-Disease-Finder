@@ -1,3 +1,12 @@
+---
+title: ArogyaKrishi Crop Disease Finder
+emoji: 🌱
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+---
+
 # ArogyaKrishi - Crop Disease Finder
 
 AI-powered plant disease detection system using deep learning.
