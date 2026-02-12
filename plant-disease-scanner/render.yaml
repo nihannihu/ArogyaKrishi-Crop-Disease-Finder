@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: arogyakrishi-web
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: AI_SERVER_URL
+        value: https://your-python-server-url.onrender.com
+      - key: NODE_VERSION
+        value: 18

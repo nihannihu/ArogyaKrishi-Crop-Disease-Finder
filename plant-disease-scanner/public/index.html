@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArogyaKrishi: Crop Disease Finder</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="AI-powered crop disease detection. Advanced plant disease scanner with AI model for crop disease identification.">
+    <meta name="keywords" content="plant disease detection, crop disease finder, AI agriculture, agricultural technology, plant health, farming technology, ArogyaKrishi">
+    <meta name="author" content="ArogyaKrishi Team">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="ArogyaKrishi: Crop Disease Finder">
+    <meta property="og:description" content="AI-powered crop disease detection. Advanced plant disease scanner with AI model for crop disease identification.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ArogyaKrishi: Crop Disease Finder">
+    <meta name="twitter:description" content="AI-powered crop disease detection. Advanced plant disease scanner with AI model for crop disease identification.">
+    <meta name="twitter:image" content="">
+    <meta name="twitter:site" content="">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="">
+    
+    <link rel="stylesheet" href="style.css">
+    
+
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+<h1>ArogyaKrishi: Crop Disease Finder</h1>
+            <nav class="navigation">
+                <a href="/" class="nav-link active">Home</a>
+                <a href="/history" class="nav-link">History</a>
+            </nav>
+        </div>
+        
+        <div class="hero-section">
+<p class="hero-text">AI-powered crop disease detection. Upload a photo of your plant's leaf to get instant disease diagnosis and treatment recommendations.</p>
+        </div>
+        
+        <form id="upload-form">
+            <input type="file" id="image-input" accept="image/*" required>
+            <button type="submit" id="analyze-btn">Analyze Crop</button>
+        </form>
+        
+        <!-- Weather Alerts Section -->
+        <div class="weather-alerts-section">
+            <button id="check-weather-alerts" class="weather-alerts-btn">Check Weather-Based Disease Risk Alerts</button>
+            <div id="weather-alerts-container" class="weather-alerts-container hidden">
+                <h3>Weather-Based Disease Risk Alerts</h3>
+                <div id="weather-alerts-content">
+                    <!-- Weather alerts will be loaded here -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Image preview container -->
+        <div id="image-preview" class="hidden" style="display: none;">
+            <img id="preview-image" src="" alt="Uploaded plant image">
+        </div>
+        
+        <!-- Loading spinner -->
+        <div id="loading" class="hidden" style="display: none;">
+            <div class="spinner"></div>
+            <p>Analyzing your crop with AI...</p>
+        </div>
+        
+        <!-- Results container -->
+        <div id="result-display" class="hidden" style="display: none;">
+            <div class="result-content">
+                <h3>Disease Detected:</h3>
+                <p class="disease-name">-</p>
+                <p class="confidence">Confidence: -%</p>
+                <div class="confidence-bar">
+                    <div class="confidence-level" style="width: 0%"></div>
+                </div>
+                <button id="view-docs-btn" class="view-docs-btn hidden">View Detailed Documentation</button>
+            </div>
+        </div>
+        
+        <!-- Disease Documentation Modal -->
+        <div id="disease-docs-modal" class="modal hidden">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 id="modal-disease-name">Disease Information</h2>
+                <div id="disease-docs-content">
+                    <!-- Disease documentation will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.DS_Store
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Editor directories and files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker
+docker-compose.override.yml
+
+# Build
+dist/
+build/
+
+# Plant Disease Scanner specific
+# Keep the JSON data but maybe ignore large temp files if any
+# The user wants trained model pushed, so DO NOT ignore *.keras or *.pkl
+
+# Ignore checking scripts/temp output
+test-results/
+coverage/
+
+# Large Datasets
+New Plant Diseases Dataset(Augmented)/
+data/

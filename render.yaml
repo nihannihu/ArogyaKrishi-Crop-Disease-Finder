@@ -1,0 +1,29 @@
+services:
+  # AI Server (Python/Flask)
+  - type: web
+    name: ai-server
+    env: docker
+    dockerContext: ./ai-server
+    dockerfilePath: ./ai-server/Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 5000
+
+  # Plant Disease Scanner (Node.js/Express)
+  - type: web
+    name: plant-disease-scanner
+    env: docker
+    dockerContext: ./plant-disease-scanner
+    dockerfilePath: ./plant-disease-scanner/Dockerfile
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: AI_SERVER_URL
+        fromService:
+          type: web
+          name: ai-server
+          property: url
+      - key: MONGODB_URI
+        sync: false # User must provide this secret in Dashboard
